@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:id="@+id/list_item_forecast_textview"
     android:text="Today - Sunny - 88/63"
-    android:background="@android:color/darker_gray"
     android:gravity="center"
     android:minHeight="?android:attr/listPreferredItemHeight"/>
 
