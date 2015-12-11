@@ -1,16 +1,12 @@
 package com.example.android.sunshine.app;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v4.app.Fragment;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import java.util.prefs.PreferenceChangeListener;
+import java.util.Map;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -29,8 +25,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onResume() {
         super.onResume();
-        getPreferenceManager().getSharedPreferences()
-                              .registerOnSharedPreferenceChangeListener(this);
+        SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        Map<String, ?> allPrefs = sharedPreferences.getAll();
+        for (Map.Entry<String, ?> prefEntry :
+                allPrefs.entrySet()) {
+            String key = prefEntry.getKey();
+            updatePref(findPreference(key), key);
+        }
     }
 
     @Override
@@ -52,9 +54,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals("pref_temp_units")) {
-            Preference preference = findPreference(key);
-            preference.setSummary(sharedPreferences.getString(key, ""));
+        updatePref(findPreference(key), key);
+    }
+
+    private void updatePref(Preference preference, String key) {
+        if (preference == null) {
+            return;
         }
+        if(preference instanceof ListPreference) {
+            ListPreference listPreference = (ListPreference) preference;
+            listPreference.setSummary(listPreference.getEntry());
+            return;
+        }
+        SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
+        String sharedPrefVal = sharedPreferences.getString(key, "Default");
+        preference.setSummary(sharedPrefVal);
     }
 }
