@@ -1,10 +1,14 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,8 +43,28 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
+        if(id== R.id.action_location) {
+            showLocationOnMap();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showLocationOnMap(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String locationSetting = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        Uri locationUri = Uri.parse("geo:0,0")
+                             .buildUpon()
+                             .appendQueryParameter("q", locationSetting)
+                             .build();
+        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(MainActivity.this, "No app found to open location", Toast.LENGTH_SHORT)
+                 .show();
+        }
     }
 
 }
