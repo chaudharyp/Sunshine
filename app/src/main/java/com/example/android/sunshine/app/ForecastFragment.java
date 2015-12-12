@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -38,7 +39,10 @@ import java.util.Arrays;
  */
 public class ForecastFragment extends Fragment {
 
+    private final String LOG_TAG = ForecastFragment.class.getSimpleName();
     private ArrayAdapter<String> mForecastAdapter;
+    private SharedPreferences sharedPreferences;
+
     public ForecastFragment() {
     }
 
@@ -46,6 +50,12 @@ public class ForecastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
@@ -93,7 +103,6 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         String locationSetting = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
         new FetchWeatherTask().execute(locationSetting);
     }
@@ -235,6 +244,14 @@ public class ForecastFragment extends Fragment {
             return highLowStr;
         }
 
+        private double convertTemp(double temp) {
+            String tempSetting = sharedPreferences.getString(getString(R.string.pref_temp_key), getString(R.string.pref_temp_default));
+            if(tempSetting.equalsIgnoreCase(getString(R.string.pref_temp_imperial))) {
+                temp = (temp * 1.8) + 32;
+            }
+            return temp;
+        }
+
         /**
          * Take the String representing the complete forecast in JSON Format and
          * pull out the data we need to construct the Strings needed for the wireframes.
@@ -300,6 +317,8 @@ public class ForecastFragment extends Fragment {
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
+                high = convertTemp(high);
+                low = convertTemp(low);
 
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;

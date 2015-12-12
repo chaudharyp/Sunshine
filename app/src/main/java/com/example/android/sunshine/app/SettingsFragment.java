@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private final String LOG_TAG = SettingsFragment.class.getSimpleName();
     public SettingsFragment() {
     }
 
