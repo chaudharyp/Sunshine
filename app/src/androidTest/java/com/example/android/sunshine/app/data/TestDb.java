@@ -145,30 +145,25 @@ public class TestDb extends AndroidTestCase {
     }
 
     public void testWeatherTable() {
-        // First insert the location, and then use the locationRowId to insert
-        // the weather. Make sure to cover as many failure cases as you can.
+        SQLiteDatabase db = new WeatherDbHelper(mContext).getWritableDatabase();
+        long locationRowId = TestUtilities.insertNorthPoleLocationValues(mContext);
 
-        // Instead of rewriting all of the code we've already written in testLocationTable
-        // we can move this code to insertLocation and then call insertLocation from both
-        // tests. Why move it? We need the code to return the ID of the inserted location
-        // and our testLocationTable can only return void because it's a test.
+        assertTrue("Error: Cannot insert row into location table", locationRowId != -1);
 
-        // First step: Get reference to writable database
+        ContentValues weatherRowValues = TestUtilities.createWeatherValues(locationRowId);
 
-        // Create ContentValues of what you want to insert
-        // (you can use the createWeatherValues TestUtilities function if you wish)
+        long weatherRowId = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, weatherRowValues);
 
-        // Insert ContentValues into database and get a row ID back
+        assertTrue("Error: Cannot insert row into weather table", weatherRowId != -1);
 
-        // Query the database and receive a Cursor back
+        Cursor weatherRowCursor = db.query(WeatherContract.WeatherEntry.TABLE_NAME, null, null, null, null, null, null);
 
-        // Move the cursor to a valid database row
+        assertTrue("Error: No row found in weather table", weatherRowCursor.moveToFirst());
 
-        // Validate data in resulting Cursor with the original ContentValues
-        // (you can use the validateCurrentRecord function in TestUtilities to validate the
-        // query if you like)
+        TestUtilities.validateCurrentRecord("Error: Weather cursor returned doesn't match with ContentValues inserted", weatherRowCursor, weatherRowValues);
 
-        // Finally, close the cursor and database
+        weatherRowCursor.close();
+        db.close();
     }
 
     public long insertLocation() {
