@@ -15,6 +15,7 @@
  */
 package com.example.android.sunshine.app.data;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
@@ -70,11 +71,11 @@ public class TestDb extends AndroidTestCase {
         c = db.rawQuery("PRAGMA table_info(" + WeatherContract.LocationEntry.TABLE_NAME + ")",
                 null);
 
-        assertTrue("Error: This means that we were unable to query the database for table information.",
+        assertTrue("Error: This means that we were unable to query the database for location table information.",
                 c.moveToFirst());
 
         // Build a HashSet of all of the column names we want to look for
-        final HashSet<String> locationColumnHashSet = new HashSet<String>();
+        final HashSet<String> locationColumnHashSet = new HashSet<>();
         locationColumnHashSet.add(WeatherContract.LocationEntry._ID);
         locationColumnHashSet.add(WeatherContract.LocationEntry.COLUMN_CITY_NAME);
         locationColumnHashSet.add(WeatherContract.LocationEntry.COLUMN_COORD_LAT);
@@ -90,28 +91,57 @@ public class TestDb extends AndroidTestCase {
         // if this fails, it means that your database doesn't contain all of the required location
         // entry columns
         assertTrue("Error: The database doesn't contain all of the required location entry columns",
-                locationColumnHashSet.isEmpty());
+                   locationColumnHashSet.isEmpty());
+
+        c = db.rawQuery("PRAGMA table_info(" + WeatherContract.WeatherEntry.TABLE_NAME + ")", null);
+        assertTrue("Error: Unable to query database for weather table information", c.moveToFirst());
+
+        final HashSet<String> weatherColumnHashSet = new HashSet<>();
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry._ID);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_DATE);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_DEGREES);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_HUMIDITY);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_LOC_KEY);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_PRESSURE);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID);
+        weatherColumnHashSet.add(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED);
+
+        columnNameIndex = c.getColumnIndex("name");
+        do {
+            String columnName = c.getString(columnNameIndex);
+            weatherColumnHashSet.remove(columnName);
+        } while (c.moveToNext());
+
+        assertTrue("Error: Data returned doesn't contain all Weather table columns", weatherColumnHashSet.isEmpty());
+
         db.close();
     }
 
     public void testLocationTable() {
-        // First step: Get reference to writable database
+        // Get reference to writable database
+        SQLiteDatabase db = new WeatherDbHelper(mContext).getWritableDatabase();
 
-        // Create ContentValues of what you want to insert
-        // (you can use the createNorthPoleLocationValues if you wish)
+        ContentValues rowToInsert = TestUtilities.createNorthPoleLocationValues();
 
         // Insert ContentValues into database and get a row ID back
+        long locationRowId = TestUtilities.insertNorthPoleLocationValues(mContext);
+        assertTrue("Error: Failure to insert North Pole Location Values", locationRowId != -1);
 
         // Query the database and receive a Cursor back
+        Cursor locationRowCursor = db.query(WeatherContract.LocationEntry.TABLE_NAME, null, null, null, null, null, null);
 
         // Move the cursor to a valid database row
+        assertTrue("Error: No row found in location table", locationRowCursor.moveToFirst());
 
         // Validate data in resulting Cursor with the original ContentValues
-        // (you can use the validateCurrentRecord function in TestUtilities to validate the
-        // query if you like)
+        TestUtilities.validateCurrentRecord("Error: Cursor returned doesn't match with ContentValues inserted", locationRowCursor, rowToInsert);
 
         // Finally, close the cursor and database
-
+        locationRowCursor.close();
+        db.close();
     }
 
     public void testWeatherTable() {
