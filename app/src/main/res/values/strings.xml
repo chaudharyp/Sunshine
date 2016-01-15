@@ -13,8 +13,8 @@
     <string name="pref_temp_label">Temperature</string>
     <string name="pref_temp_key">temp</string>
     <string name="pref_temp_default">@string/pref_temp_metric</string>
-    <string name="pref_temp_metric">Celsius</string>
-    <string name="pref_temp_imperial">Fahrenheit</string>
+    <string name="pref_temp_metric">metric</string>
+    <string name="pref_temp_imperial">imperial</string>
     <string name="action_location" translatable="false">Location</string>
     <string name="action_share" translatable="false">Share</string>
     <string-array name="pref_temp_entries">
