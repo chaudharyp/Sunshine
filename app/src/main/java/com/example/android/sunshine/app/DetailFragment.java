@@ -100,10 +100,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         boolean isMetric = Utility.isMetric(getActivity());
 
-        String high = Utility.formatTemperature(
+        String high = Utility.formatTemperature(getContext(),
                 data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
 
-        String low = Utility.formatTemperature(
+        String low = Utility.formatTemperature(getContext(),
                 data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
 
         mForecastStr = String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low);
