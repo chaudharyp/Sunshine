@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private String LOG_TAG = MainActivity.class.getSimpleName();
+    private String mLocation;
+    private final String FORECASTFRAGMENT_TAG = "Forecast";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,9 +21,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                                       .add(R.id.container, new ForecastFragment())
+                                       .add(R.id.container, new ForecastFragment(), FORECASTFRAGMENT_TAG)
                                        .commit();
         }
+        mLocation = Utility.getPreferredLocation(this);
     }
 
     @Override
@@ -33,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(this))) {
+            ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
+            if (ff != null) {
+                ff.onLocationChanged();
+            }
+            mLocation = Utility.getPreferredLocation(this);
+        }
         Log.d(LOG_TAG, "inside onResume");
     }
 
