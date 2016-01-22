@@ -166,6 +166,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(0, null, this);
     }
 
+    public void setUseTodayLayout(boolean mTwoPane) {
+        if (mForecastAdapter != null) {
+            mForecastAdapter.setUseTodayLayout(mTwoPane);
+        }
+    }
+
     public interface Callback {
         void onItemSelected(Uri dateUri);
     }
