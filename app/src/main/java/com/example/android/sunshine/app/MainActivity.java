@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ForecastFragment.Callback {
     private String LOG_TAG = MainActivity.class.getSimpleName();
     private String mLocation;
     private final String DETAILFRAGMENT_TAG = "DFTAG";
@@ -51,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
             ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
             if (ff != null) {
                 ff.onLocationChanged();
+            }
+            DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+            if (df != null) {
+                df.onLocationChanged(mLocation);
             }
             mLocation = Utility.getPreferredLocation(this);
         }
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
-        if(id== R.id.action_location) {
+        if (id == R.id.action_location) {
             showLocationOnMap();
             return true;
         }
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showLocationOnMap(){
+    private void showLocationOnMap() {
         String locationSetting = Utility.getPreferredLocation(this);
         Uri locationUri = Uri.parse("geo:0,0")
                              .buildUpon()
@@ -118,4 +122,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onItemSelected(Uri dateUri) {
+        if (mTwoPane) {
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, dateUri);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                                       .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+                                       .commit();
+        } else {
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.setData(dateUri);
+            startActivity(intent);
+        }
+    }
 }

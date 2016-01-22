@@ -90,10 +90,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
                     String locationSetting = Utility.getPreferredLocation(getContext());
-                    Intent intent = new Intent(getContext(), DetailActivity.class).setData(WeatherContract
-                                                                                                   .WeatherEntry
-                                                                                                   .buildWeatherLocationWithDate(locationSetting, cursor.getLong(COL_WEATHER_DATE)));
-                    startActivity(intent);
+                    Callback callbackActivity = (Callback) getActivity();
+                    callbackActivity.onItemSelected(WeatherContract
+                                                            .WeatherEntry
+                                                            .buildWeatherLocationWithDate(locationSetting, cursor.getLong(COL_WEATHER_DATE)));
                 }
             }
         });
@@ -145,5 +145,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLocationChanged() {
         updateWeather();
         getLoaderManager().restartLoader(0, null, this);
+    }
+
+    public interface Callback {
+        void onItemSelected(Uri dateUri);
     }
 }
