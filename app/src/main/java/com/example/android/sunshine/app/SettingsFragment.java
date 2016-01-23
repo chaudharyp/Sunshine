@@ -2,6 +2,7 @@ package com.example.android.sunshine.app;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -66,6 +67,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if(preference instanceof ListPreference) {
             ListPreference listPreference = (ListPreference) preference;
             listPreference.setSummary(listPreference.getEntry());
+            return;
+        }
+        if (preference instanceof CheckBoxPreference) {
+            SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
+            boolean sharedPrefVal = sharedPreferences.getBoolean(key, true);
+            String summary = sharedPrefVal ? "Enabled" : "Not enabled";
+            preference.setSummary(summary);
             return;
         }
         SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
