@@ -106,27 +106,8 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             startActivity(intent);
             return true;
         }
-        if (id == R.id.action_location) {
-            showLocationOnMap();
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void showLocationOnMap() {
-        String locationSetting = Utility.getPreferredLocation(this);
-        Uri locationUri = Uri.parse("geo:0,0")
-                             .buildUpon()
-                             .appendQueryParameter("q", locationSetting)
-                             .build();
-        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            Toast.makeText(MainActivity.this, "No app found to open location", Toast.LENGTH_SHORT)
-                 .show();
-        }
     }
 
     @Override
